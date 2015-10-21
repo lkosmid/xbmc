@@ -2,7 +2,7 @@
 
 #if defined(HAVE_X11) && defined(HAS_EGL)
 
-#include "WinSystemX11GLContextEGL.h"
+#include "WinSystemX11GLESContext.h"
 #include "utils/log.h"
 #include "guilib/GraphicContext.h"
 #include "guilib/DispResource.h"
