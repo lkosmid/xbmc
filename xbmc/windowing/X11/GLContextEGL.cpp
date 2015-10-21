@@ -17,9 +17,38 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
-#include "system_gl.h"
+#include "system.h"
 
 #if defined(HAVE_X11) && defined(HAS_EGL)
+
+#ifdef HAS_GL
+  // always define GL_GLEXT_PROTOTYPES before include gl headers
+  #if !defined(GL_GLEXT_PROTOTYPES)
+    #define GL_GLEXT_PROTOTYPES
+  #endif
+  #if defined(TARGET_WINDOWS)
+    #include <GL/gl.h>
+    #include <GL/glu.h>
+  #elif defined(TARGET_LINUX)
+    #include <GL/gl.h>
+    #include <GL/glu.h>
+    #include <GL/glext.h>
+  #elif defined(TARGET_FREEBSD)
+    #include <GL/gl.h>
+  #elif defined(TARGET_DARWIN)
+    #include <GL/glew.h>
+    #include <OpenGL/gl.h>
+    #include <OpenGL/glext.h>
+  #endif
+#elif HAS_GLES == 2
+  #if defined(TARGET_DARWIN)
+    #include <OpenGLES/ES2/gl.h>
+    #include <OpenGLES/ES2/glext.h>
+  #else
+    #include <GLES2/gl2.h>
+    #include <GLES2/gl2ext.h>
+  #endif
+#endif
 
 #include "GLContextEGL.h"
 #include "utils/log.h"
