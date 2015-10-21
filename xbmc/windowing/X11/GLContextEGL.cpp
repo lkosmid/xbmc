@@ -329,9 +329,7 @@ EGLConfig CGLContextEGL::getEGLConfig(EGLDisplay eglDisplay, XVisualInfo *vInfo)
     }
     if (value == (EGLint)vInfo->visualid) {
       eglConfig = eglConfigs[i];
-      //Don't select the first one, let's keep the last instead
-      //eg. SGX 545 on X11 returns 3 configurations with the same visualid but the first has depth=0
-      //break;
+      break;
     }
   }
 
