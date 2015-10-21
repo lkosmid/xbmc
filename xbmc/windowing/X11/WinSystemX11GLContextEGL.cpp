@@ -9,17 +9,17 @@
 #include "threads/SingleLock.h"
 #include "Application.h"
 
-CWinSystemX11GLContextEGL::CWinSystemX11GLContextEGL()
+CWinSystemX11GLESContext::CWinSystemX11GLESContext()
 {
   m_pGLContext = NULL;
 }
 
-CWinSystemX11GLContextEGL::~CWinSystemX11GLContextEGL()
+CWinSystemX11GLESContext::~CWinSystemX11GLESContext()
 {
   delete m_pGLContext;
 }
 
-bool CWinSystemX11GLContextEGL::PresentRenderImpl(const CDirtyRegionList& dirty)
+bool CWinSystemX11GLESContext::PresentRenderImpl(const CDirtyRegionList& dirty)
 {
   m_pGLContext->SwapBuffers(dirty, m_iVSyncMode);
   if (m_delayDispReset && m_dispResetTimer.IsTimePast())
@@ -32,12 +32,12 @@ bool CWinSystemX11GLContextEGL::PresentRenderImpl(const CDirtyRegionList& dirty)
   }
 }
 
-void CWinSystemX11GLContextEGL::SetVSyncImpl(bool enable)
+void CWinSystemX11GLESContext::SetVSyncImpl(bool enable)
 {
   m_pGLContext->SetVSync(enable, m_iVSyncMode);
 }
 
-bool CWinSystemX11GLContextEGL::IsExtSupported(const char* extension)
+bool CWinSystemX11GLESContext::IsExtSupported(const char* extension)
 {
   if(strncmp(extension, m_pGLContext->ExtPrefix().c_str(), 4) != 0)
     return CRenderSystemGLES::IsExtSupported(extension);
@@ -45,7 +45,7 @@ bool CWinSystemX11GLContextEGL::IsExtSupported(const char* extension)
   return m_pGLContext->IsExtSupported(extension);
 }
 
-bool CWinSystemX11GLContextEGL::SetWindow(int width, int height, bool fullscreen, const std::string &output, int *winstate)
+bool CWinSystemX11GLESContext::SetWindow(int width, int height, bool fullscreen, const std::string &output, int *winstate)
 {
   int newwin = 0;
   CWinSystemX11::SetWindow(width, height, fullscreen, output, &newwin);
@@ -72,9 +72,9 @@ bool CWinSystemX11GLContextEGL::SetWindow(int width, int height, bool fullscreen
   return true;
 }
 
-bool CWinSystemX11GLContextEGL::CreateNewWindow(const std::string& name, bool fullScreen, RESOLUTION_INFO& res, PHANDLE_EVENT_FUNC userFunction)
+bool CWinSystemX11GLESContext::CreateNewWindow(const std::string& name, bool fullScreen, RESOLUTION_INFO& res, PHANDLE_EVENT_FUNC userFunction)
 {
-  CLog::Log(LOGNOTICE, "CWinSystemX11GLContextEGL::CreateNewWindow");
+  CLog::Log(LOGNOTICE, "CWinSystemX11GLESContext::CreateNewWindow");
   if(!CWinSystemX11::CreateNewWindow(name, fullScreen, res, userFunction))
     return false;
 
@@ -82,7 +82,7 @@ bool CWinSystemX11GLContextEGL::CreateNewWindow(const std::string& name, bool fu
   return true;
 }
 
-bool CWinSystemX11GLContextEGL::ResizeWindow(int newWidth, int newHeight, int newLeft, int newTop)
+bool CWinSystemX11GLESContext::ResizeWindow(int newWidth, int newHeight, int newLeft, int newTop)
 {
   m_newGlContext = false;
   CWinSystemX11::ResizeWindow(newWidth, newHeight, newLeft, newTop);
@@ -94,7 +94,7 @@ bool CWinSystemX11GLContextEGL::ResizeWindow(int newWidth, int newHeight, int ne
   return true;
 }
 
-bool CWinSystemX11GLContextEGL::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
+bool CWinSystemX11GLESContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
 {
   m_newGlContext = false;
   CWinSystemX11::SetFullScreen(fullScreen, res, blankOtherDisplays);
@@ -106,7 +106,7 @@ bool CWinSystemX11GLContextEGL::SetFullScreen(bool fullScreen, RESOLUTION_INFO& 
   return true;
 }
 
-bool CWinSystemX11GLContextEGL::DestroyWindowSystem()
+bool CWinSystemX11GLESContext::DestroyWindowSystem()
 {
   bool ret;
   m_pGLContext->Destroy();
@@ -114,7 +114,7 @@ bool CWinSystemX11GLContextEGL::DestroyWindowSystem()
   return ret;
 }
 
-bool CWinSystemX11GLContextEGL::DestroyWindow()
+bool CWinSystemX11GLESContext::DestroyWindow()
 {
   bool ret;
   m_pGLContext->Detach();
@@ -122,18 +122,18 @@ bool CWinSystemX11GLContextEGL::DestroyWindow()
   return ret;
 }
 
-XVisualInfo* CWinSystemX11GLContextEGL::GetVisual()
+XVisualInfo* CWinSystemX11GLESContext::GetVisual()
 {
-  CLog::Log(LOGNOTICE, "CWinSystemX11GLContextEGL::GetVisual() m_pGLContext:%p GetVisual", m_pGLContext);
+  CLog::Log(LOGNOTICE, "CWinSystemX11GLESContext::GetVisual() m_pGLContext:%p GetVisual", m_pGLContext);
   if(!m_pGLContext)
   {
-    CLog::Log(LOGNOTICE, "Create new CGLContextEGL at CWinSystemX11GLContextEGL::CreateNewWindow, m_dpy=%p", m_dpy);
+    CLog::Log(LOGNOTICE, "Create new CGLContextEGL at CWinSystemX11GLESContext::CreateNewWindow, m_dpy=%p", m_dpy);
     m_pGLContext = new CGLContextEGL(m_dpy);
   }
   return m_pGLContext->GetVisual();
 }
 
-bool CWinSystemX11GLContextEGL::RefreshGLContext(bool force)
+bool CWinSystemX11GLESContext::RefreshGLContext(bool force)
 {
   bool firstrun = false;
   if (!m_pGLContext)
@@ -163,7 +163,7 @@ bool CWinSystemX11GLContextEGL::RefreshGLContext(bool force)
   return ret;
 }
 
-bool CWinSystemX11GLContextEGL::DestroyGLContext()
+bool CWinSystemX11GLESContext::DestroyGLContext()
 {
   m_pGLContext->Destroy();
 }

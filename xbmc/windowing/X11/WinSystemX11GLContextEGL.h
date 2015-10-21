@@ -27,11 +27,11 @@
 #include "GLContextEGL.h"
 #include "EGL/egl.h"
 
-class CWinSystemX11GLContextEGL : public CWinSystemX11, public CRenderSystemGLES
+class CWinSystemX11GLESContext : public CWinSystemX11, public CRenderSystemGLES
 {
 public:
-  CWinSystemX11GLContextEGL();
-  virtual ~CWinSystemX11GLContextEGL();
+  CWinSystemX11GLESContext();
+  virtual ~CWinSystemX11GLESContext();
 
   virtual bool CreateNewWindow(const std::string& name, bool fullScreen, RESOLUTION_INFO& res, PHANDLE_EVENT_FUNC userFunction);
   virtual bool ResizeWindow(int newWidth, int newHeight, int newLeft, int newTop);
@@ -58,6 +58,6 @@ protected:
   bool m_newGlContext;
 };
 
-#define g_Windowing XBMC_GLOBAL_USE(CWinSystemX11GLContextEGL)
+#define g_Windowing XBMC_GLOBAL_USE(CWinSystemX11GLESContext)
 
 #endif
