@@ -44,6 +44,8 @@ protected:
   PFNGLXSWAPINTERVALEXTPROC m_glXSwapIntervalEXT;
   int m_nScreen;
   int m_iVSyncErrors;
+  GLXWindow m_glxWindow;
+  GLXContext m_glxContext;
 };
 
 #endif

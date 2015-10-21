@@ -1,5 +1,6 @@
 SRCS=WinSystemX11.cpp \
      WinSystemX11GLContext.cpp \
+     WinSystemX11GLContextEGL.cpp \
      GLContextEGL.cpp \
      GLContextGLX.cpp \
      XRandR.cpp \

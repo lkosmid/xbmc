@@ -17,17 +17,22 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#include "system_gl.h"
 
-#include "system.h"
-
-#if defined(HAVE_X11)
+#if defined(HAVE_X11) && defined(HAS_EGL)
 
 #include "GLContextEGL.h"
 #include "utils/log.h"
 
+#define EGL_NO_CONFIG (EGLConfig)0
+
 CGLContextEGL::CGLContextEGL(Display *dpy) : CGLContext(dpy)
 {
   m_extPrefix = "EGL_";
+  m_eglDisplay = EGL_NO_DISPLAY;
+  m_eglSurface = EGL_NO_SURFACE;
+  m_eglContext = EGL_NO_CONTEXT;
+  m_eglConfig = EGL_NO_CONFIG;
 }
 
 CGLContextEGL::~CGLContextEGL()
@@ -165,7 +170,10 @@ bool CGLContextEGL::Refresh(bool force, int screen, Window glWindow, bool &newCo
     }
 #endif
 
-    m_eglConfig = getEGLConfig(m_eglDisplay, vInfo);
+    if(m_eglConfig == EGL_NO_CONFIG)
+    {
+      m_eglConfig = getEGLConfig(m_eglDisplay, vInfo);
+    }
 
     if (m_eglConfig == EGL_NO_CONFIG)
     {
@@ -321,7 +329,9 @@ EGLConfig CGLContextEGL::getEGLConfig(EGLDisplay eglDisplay, XVisualInfo *vInfo)
     }
     if (value == (EGLint)vInfo->visualid) {
       eglConfig = eglConfigs[i];
-      break;
+      //Don't select the first one, let's keep the last instead
+      //eg. SGX 545 on X11 returns 3 configurations with the same visualid but the first has depth=0
+      //break;
     }
   }
 
@@ -362,6 +372,53 @@ bool CGLContextEGL::IsExtSupported(const char* extension)
   name += " ";
 
   return m_extensions.find(name) != std::string::npos;
+}
+
+XVisualInfo* CGLContextEGL::GetVisual()
+{
+    GLint att[] =
+    {
+      EGL_RED_SIZE, 8,
+      EGL_GREEN_SIZE, 8,
+      EGL_BLUE_SIZE, 8,
+      EGL_ALPHA_SIZE, 8,
+      EGL_BUFFER_SIZE, 32,
+      EGL_DEPTH_SIZE, 24,
+      EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+      EGL_NONE
+    };
+
+    if (m_eglDisplay == EGL_NO_DISPLAY)
+    {
+      m_eglDisplay = eglGetDisplay((EGLNativeDisplayType)m_dpy);
+      if (m_eglDisplay == EGL_NO_DISPLAY)
+      {
+        CLog::Log(LOGERROR, "failed to get egl display\n");
+	return NULL;
+      }
+      if (!eglInitialize(m_eglDisplay, NULL, NULL))
+      {
+	CLog::Log(LOGERROR, "failed to initialize egl display\n");
+	return NULL;
+      }
+    }
+
+    EGLint numConfigs;
+    EGLConfig eglConfig = 0;
+    if (!eglChooseConfig(m_eglDisplay, att, &eglConfig, 1, &numConfigs) || numConfigs == 0) {
+      CLog::Log(LOGERROR, "Failed to choose a config %d\n", eglGetError());
+    }
+    m_eglConfig=eglConfig;
+
+    XVisualInfo x11_visual_info_template;
+    if (!eglGetConfigAttrib(m_eglDisplay, m_eglConfig, EGL_NATIVE_VISUAL_ID, (EGLint*)&x11_visual_info_template.visualid)) {
+      CLog::Log(LOGERROR, "Failed to query native visual id\n");
+    }
+    int num_visuals;
+    return XGetVisualInfo(m_dpy,
+                        VisualIDMask,
+			&x11_visual_info_template,
+			&num_visuals);
 }
 
 #endif
