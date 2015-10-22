@@ -23,9 +23,12 @@
 #if defined(HAVE_X11)
 
 #include "WinSystemX11.h"
-#include "GLContext.h"
+#include "GL/glx.h"
+#include "EGL/egl.h"
 #include "rendering/gl/RenderSystemGL.h"
 #include "utils/GlobalsHandling.h"
+
+class CGLContext;
 
 class CWinSystemX11GLContext : public CWinSystemX11, public CRenderSystemGL
 {
@@ -40,12 +43,12 @@ public:
 
   virtual bool IsExtSupported(const char* extension);
 
-  GLXWindow GetWindow() { return m_pGLContext->m_glxWindow; }
-  GLXContext GetGlxContext() { return m_pGLContext->m_glxContext; }
-  EGLDisplay GetEGLDisplay() const { return m_pGLContext->m_eglDisplay; }
-  EGLSurface GetEGLSurface() const { return m_pGLContext->m_eglSurface; }
-  EGLContext GetEGLContext() const { return m_pGLContext->m_eglContext; }
-  EGLConfig GetEGLConfig() const { return m_pGLContext->m_eglConfig; }
+  GLXWindow GetWindow() const;
+  GLXContext GetGlxContext() const;
+  EGLDisplay GetEGLDisplay() const;
+  EGLSurface GetEGLSurface() const;
+  EGLContext GetEGLContext() const;
+  EGLConfig GetEGLConfig() const;
 
 protected:
   virtual bool SetWindow(int width, int height, bool fullscreen, const std::string &output, int *winstate = NULL);

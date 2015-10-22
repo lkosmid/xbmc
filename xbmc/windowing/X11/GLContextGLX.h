@@ -35,6 +35,8 @@ public:
   virtual bool SwapBuffers(const CDirtyRegionList& dirty, int &mode);
   virtual void QueryExtensions();
   virtual bool IsExtSupported(const char* extension);
+  GLXWindow m_glxWindow;
+  GLXContext m_glxContext;
 protected:
   bool IsSuitableVisual(XVisualInfo *vInfo);
 
@@ -44,8 +46,6 @@ protected:
   PFNGLXSWAPINTERVALEXTPROC m_glXSwapIntervalEXT;
   int m_nScreen;
   int m_iVSyncErrors;
-  GLXWindow m_glxWindow;
-  GLXContext m_glxContext;
 };
 
 #endif
